@@ -1,0 +1,2544 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Finova — Personal Finance</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+/* =====================================
+   RESET
+===================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+
+    min-height: 100vh;
+
+    color: white;
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(0,255,179,.14),
+            transparent 25%
+        ),
+
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(111,76,255,.18),
+            transparent 25%
+        ),
+
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(0,180,255,.08),
+            transparent 30%
+        ),
+
+        #050505;
+
+    overflow-x: hidden;
+}
+
+
+/* =====================================
+   BACKGROUND ORNAMENT
+===================================== */
+
+body::before,
+body::after {
+
+    content: "";
+
+    position: fixed;
+
+    width: 300px;
+    height: 300px;
+
+    border-radius: 50%;
+
+    filter: blur(110px);
+
+    opacity: .25;
+
+    z-index: -1;
+}
+
+body::before {
+
+    background: #00ffb3;
+
+    top: -120px;
+    left: -120px;
+}
+
+body::after {
+
+    background: #704cff;
+
+    right: -120px;
+    bottom: -120px;
+}
+
+
+/* =====================================
+   LOGIN
+===================================== */
+
+#authPage {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+}
+
+
+.auth-box {
+
+    width: min(420px, 100%);
+
+    padding: 30px;
+
+    border-radius: 28px;
+
+    background:
+        rgba(18,18,18,.82);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,.45);
+}
+
+
+.logo {
+
+    font-size: 32px;
+
+    font-weight: 900;
+
+    letter-spacing: -1px;
+}
+
+.logo span {
+
+    color: #00ffb3;
+}
+
+
+.auth-subtitle {
+
+    color: #777;
+
+    font-size: 13px;
+
+    margin-top: 7px;
+
+    margin-bottom: 28px;
+}
+
+
+.auth-tabs {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 5px;
+
+    background: #0b0b0b;
+
+    padding: 5px;
+
+    border-radius: 12px;
+
+    margin-bottom: 22px;
+}
+
+
+.auth-tab {
+
+    padding: 10px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #777;
+
+    cursor: pointer;
+}
+
+
+.auth-tab.active {
+
+    background: #00ffb3;
+
+    color: black;
+
+    font-weight: bold;
+}
+
+
+.form-group {
+
+    margin-bottom: 15px;
+}
+
+
+label {
+
+    display: block;
+
+    color: #999;
+
+    font-size: 12px;
+
+    margin-bottom: 7px;
+}
+
+
+input,
+select {
+
+    width: 100%;
+
+    padding: 13px;
+
+    color: white;
+
+    background: #0e0e0e;
+
+    border: 1px solid #292929;
+
+    border-radius: 12px;
+
+    outline: none;
+}
+
+
+input:focus,
+select:focus {
+
+    border-color: #00ffb3;
+}
+
+
+.primary-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #00ffb3,
+            #00c98e
+        );
+
+    color: black;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    margin-top: 5px;
+}
+
+
+.message {
+
+    margin-top: 15px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    color: #999;
+}
+
+
+/* =====================================
+   APP
+===================================== */
+
+#appPage {
+
+    display: none;
+
+    width: min(1200px, 94%);
+
+    margin: auto;
+
+    padding:
+        25px 0 50px;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+
+.header-left .logo {
+
+    font-size: 28px;
+}
+
+
+.subtitle {
+
+    color: #777;
+
+    font-size: 12px;
+
+    margin-top: 5px;
+}
+
+
+.header-right {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.user-email {
+
+    color: #777;
+
+    font-size: 11px;
+}
+
+
+.logout {
+
+    padding: 9px 13px;
+
+    border-radius: 10px;
+
+    border: 1px solid #292929;
+
+    background: #111;
+
+    color: #aaa;
+
+    cursor: pointer;
+}
+
+
+.logout:hover {
+
+    color: #ff5577;
+
+    border-color: #ff5577;
+}
+
+
+/* =====================================
+   DASHBOARD
+===================================== */
+
+.dashboard {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr 1fr 1fr;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+
+.card {
+
+    position: relative;
+
+    padding: 22px;
+
+    border-radius: 22px;
+
+    background:
+        rgba(20,20,20,.72);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    backdrop-filter: blur(15px);
+
+    overflow: hidden;
+}
+
+
+.card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+    height: 100px;
+
+    right: -20px;
+    top: -20px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(0,255,179,.10);
+
+    filter: blur(35px);
+}
+
+
+.card-title {
+
+    color: #888;
+
+    font-size: 12px;
+
+    margin-bottom: 10px;
+}
+
+
+.balance {
+
+    font-size: 31px;
+
+    font-weight: 900;
+}
+
+
+.small-value {
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+
+.income {
+
+    color: #00ffb3;
+}
+
+
+.expense {
+
+    color: #ff5577;
+}
+
+
+/* =====================================
+   MAIN
+===================================== */
+
+.main {
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr 1fr;
+
+    gap: 20px;
+}
+
+
+.section {
+
+    padding: 20px;
+
+    border-radius: 22px;
+
+    background:
+        rgba(15,15,15,.75);
+
+    border:
+        1px solid rgba(255,255,255,.07);
+
+    backdrop-filter: blur(15px);
+}
+
+
+.section-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 18px;
+}
+
+
+.section-title {
+
+    font-size: 19px;
+
+    font-weight: bold;
+}
+
+
+/* =====================================
+   BUTTON
+===================================== */
+
+.add-btn {
+
+    padding: 10px 15px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background: #00ffb3;
+
+    color: black;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+/* =====================================
+   FILTER
+===================================== */
+
+.filters {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 12px;
+}
+
+
+.filter {
+
+    padding: 8px 12px;
+
+    border-radius: 9px;
+
+    background: #181818;
+
+    color: #777;
+
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+
+.filter.active {
+
+    background: #00ffb3;
+
+    color: black;
+}
+
+
+/* =====================================
+   TRANSACTION
+===================================== */
+
+.transaction {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 15px 0;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.06);
+}
+
+
+.transaction:last-child {
+
+    border-bottom: none;
+}
+
+
+.transaction-left {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.icon {
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 13px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background: #1b1b1b;
+
+    font-size: 18px;
+}
+
+
+.transaction-name {
+
+    font-size: 14px;
+
+    font-weight: bold;
+}
+
+
+.transaction-date {
+
+    color: #666;
+
+    font-size: 10px;
+
+    margin-top: 4px;
+}
+
+
+.transaction-amount {
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.delete {
+
+    background: none;
+
+    color: #666;
+
+    margin-left: 8px;
+
+    cursor: pointer;
+}
+
+
+.delete:hover {
+
+    color: #ff5577;
+}
+
+
+/* =====================================
+   CHART
+===================================== */
+
+.chart {
+
+    height: 220px;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 10px;
+
+    padding-top: 20px;
+}
+
+
+.bar-wrapper {
+
+    flex: 1;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: center;
+
+    position: relative;
+}
+
+
+.bar {
+
+    width: 65%;
+
+    max-width: 35px;
+
+    min-height: 5px;
+
+    border-radius:
+        7px 7px 3px 3px;
+
+    background:
+        linear-gradient(
+            to top,
+            #00ffb3,
+            #704cff
+        );
+
+    transition: .4s;
+}
+
+
+.bar-label {
+
+    position: absolute;
+
+    bottom: -20px;
+
+    color: #666;
+
+    font-size: 9px;
+}
+
+
+/* =====================================
+   EMPTY
+===================================== */
+
+.empty {
+
+    text-align: center;
+
+    color: #666;
+
+    padding: 35px 10px;
+}
+
+
+/* =====================================
+   MODAL
+===================================== */
+
+.modal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background:
+        rgba(0,0,0,.75);
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    z-index: 100;
+}
+
+
+.modal-content {
+
+    width: min(430px,100%);
+
+    padding: 23px;
+
+    border-radius: 22px;
+
+    background: #111;
+
+    border: 1px solid #292929;
+}
+
+
+.modal-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 20px;
+}
+
+
+.close {
+
+    background: none;
+
+    color: #aaa;
+
+    font-size: 22px;
+
+    cursor: pointer;
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media(max-width:800px) {
+
+    .dashboard {
+
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .dashboard
+    .card:first-child {
+
+        grid-column:
+            1 / -1;
+    }
+
+    .main {
+
+        grid-template-columns:
+            1fr;
+    }
+
+    .user-email {
+
+        display: none;
+    }
+
+}
+
+
+@media(max-width:500px) {
+
+    #appPage {
+
+        width: 92%;
+    }
+
+    .header-left .logo {
+
+        font-size: 23px;
+    }
+
+    .card {
+
+        padding: 17px;
+    }
+
+    .balance {
+
+        font-size: 25px;
+    }
+
+    .small-value {
+
+        font-size: 17px;
+    }
+
+    .section {
+
+        padding: 16px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     AUTH PAGE
+===================================== -->
+
+<div id="authPage">
+
+<div class="auth-box">
+
+<div class="logo">
+    Fino<span>va.</span>
+</div>
+
+<div class="auth-subtitle">
+    Kelola uangmu. Bukan sebaliknya.
+</div>
+
+
+<div class="auth-tabs">
+
+<button
+    id="loginTab"
+    class="auth-tab active"
+    onclick="showLogin()"
+>
+    Login
+</button>
+
+<button
+    id="registerTab"
+    class="auth-tab"
+    onclick="showRegister()"
+>
+    Daftar
+</button>
+
+</div>
+
+
+<!-- LOGIN -->
+
+<div id="loginForm">
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+    id="loginEmail"
+    type="email"
+    placeholder="email@contoh.com"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Password</label>
+
+<input
+    id="loginPassword"
+    type="password"
+    placeholder="Password"
+>
+
+</div>
+
+
+<button
+    class="primary-btn"
+    onclick="login()"
+>
+    Masuk
+</button>
+
+</div>
+
+
+<!-- REGISTER -->
+
+<div
+    id="registerForm"
+    style="display:none"
+>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+    id="registerEmail"
+    type="email"
+    placeholder="email@contoh.com"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Password</label>
+
+<input
+    id="registerPassword"
+    type="password"
+    placeholder="Minimal 6 karakter"
+>
+
+</div>
+
+
+<button
+    class="primary-btn"
+    onclick="register()"
+>
+    Buat Akun
+</button>
+
+</div>
+
+
+<div
+    id="authMessage"
+    class="message"
+></div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================
+     APP PAGE
+===================================== -->
+
+<div id="appPage">
+
+
+<header>
+
+<div class="header-left">
+
+<div class="logo">
+Fino<span>va.</span>
+</div>
+
+<div class="subtitle">
+Kelola uangmu. Bukan sebaliknya.
+</div>
+
+</div>
+
+
+<div class="header-right">
+
+<div
+    id="userEmail"
+    class="user-email"
+>
+</div>
+
+<button
+    class="logout"
+    onclick="logout()"
+>
+Keluar
+</button>
+
+</div>
+
+</header>
+
+
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+
+<div class="card">
+
+<div class="card-title">
+TOTAL SALDO
+</div>
+
+<div
+    id="balance"
+    class="balance"
+>
+Rp 0
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+PEMASUKAN
+</div>
+
+<div
+    id="income"
+    class="small-value income"
+>
+Rp 0
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="card-title">
+PENGELUARAN
+</div>
+
+<div
+    id="expense"
+    class="small-value expense"
+>
+Rp 0
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="main">
+
+
+<!-- TRANSACTIONS -->
+
+<div class="section">
+
+<div class="section-header">
+
+<div class="section-title">
+Transaksi
+</div>
+
+<button
+    class="add-btn"
+    onclick="openModal()"
+>
++ Tambah
+</button>
+
+</div>
+
+
+<div class="filters">
+
+<div
+    class="filter active"
+    onclick="filterData('all',this)"
+>
+Semua
+</div>
+
+<div
+    class="filter"
+    onclick="filterData('income',this)"
+>
+Pemasukan
+</div>
+
+<div
+    class="filter"
+    onclick="filterData('expense',this)"
+>
+Pengeluaran
+</div>
+
+</div>
+
+
+<div id="transactionList"></div>
+
+</div>
+
+
+
+<!-- RIGHT -->
+
+<div>
+
+
+<div
+    class="section"
+    style="margin-bottom:20px"
+>
+
+<div class="section-header">
+
+<div class="section-title">
+Pengeluaran
+</div>
+
+<span
+    style="
+    font-size:11px;
+    color:#777
+    "
+>
+7 hari
+</span>
+
+</div>
+
+
+<div
+    id="chart"
+    class="chart"
+></div>
+
+</div>
+
+
+
+<div class="section">
+
+<div
+    class="section-title"
+    style="margin-bottom:15px"
+>
+Insight 💡
+</div>
+
+<div
+    id="insight"
+    style="
+    color:#888;
+    font-size:13px;
+    line-height:1.7
+    "
+>
+Belum ada transaksi.
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =====================================
+     MODAL
+===================================== -->
+
+<div
+    id="modal"
+    class="modal"
+>
+
+<div class="modal-content">
+
+
+<div class="modal-header">
+
+<h2>
+Tambah Transaksi
+</h2>
+
+<button
+    class="close"
+    onclick="closeModal()"
+>
+×
+</button>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Nama transaksi
+</label>
+
+<input
+    id="name"
+    type="text"
+    placeholder="Contoh: Makan siang"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Jumlah
+</label>
+
+<input
+    id="amount"
+    type="number"
+    placeholder="50000"
+>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Jenis
+</label>
+
+<select id="type">
+
+<option value="expense">
+Pengeluaran
+</option>
+
+<option value="income">
+Pemasukan
+</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Kategori
+</label>
+
+<select id="category">
+
+<option>Makanan</option>
+
+<option>Transportasi</option>
+
+<option>Belanja</option>
+
+<option>Hiburan</option>
+
+<option>Tagihan</option>
+
+<option>Pendidikan</option>
+
+<option>Gaji</option>
+
+<option>Lainnya</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+
+<label>
+Tanggal
+</label>
+
+<input
+    id="date"
+    type="date"
+>
+
+</div>
+
+
+<button
+    class="primary-btn"
+    onclick="addTransaction()"
+>
+Simpan Transaksi
+</button>
+
+
+</div>
+
+</div>
+
+
+
+<script>
+
+/* =====================================
+   SUPABASE CONFIG
+===================================== */
+
+/*
+    GANTI DUA NILAI DI BAWAH INI
+*/
+
+const SUPABASE_URL =
+"https://krzttskzpbajyprowdqd.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_s760LsBrsEmoPrRJjSoC7w_cVeud0bg";
+
+
+const {
+    createClient
+} = supabase;
+
+
+const db =
+createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =====================================
+   STATE
+===================================== */
+
+let transactions = [];
+
+let currentFilter = "all";
+
+let currentUser = null;
+
+
+/* =====================================
+   AUTH STATE
+===================================== */
+
+async function checkSession() {
+
+    const {
+        data
+    } = await db.auth.getSession();
+
+    if (
+        data.session &&
+        data.session.user
+    ) {
+
+        currentUser =
+            data.session.user;
+
+        showApp();
+
+    } else {
+
+        showAuth();
+
+    }
+
+}
+
+
+db.auth.onAuthStateChange(
+    async (event, session) => {
+
+        if (
+            session &&
+            session.user
+        ) {
+
+            currentUser =
+                session.user;
+
+            showApp();
+
+        } else {
+
+            currentUser = null;
+
+            showAuth();
+
+        }
+
+    }
+);
+
+
+/* =====================================
+   LOGIN / REGISTER UI
+===================================== */
+
+function showLogin() {
+
+    document
+        .getElementById("loginForm")
+        .style.display = "block";
+
+    document
+        .getElementById("registerForm")
+        .style.display = "none";
+
+    document
+        .getElementById("loginTab")
+        .classList.add("active");
+
+    document
+        .getElementById("registerTab")
+        .classList.remove("active");
+
+    clearMessage();
+
+}
+
+
+function showRegister() {
+
+    document
+        .getElementById("loginForm")
+        .style.display = "none";
+
+    document
+        .getElementById("registerForm")
+        .style.display = "block";
+
+    document
+        .getElementById("loginTab")
+        .classList.remove("active");
+
+    document
+        .getElementById("registerTab")
+        .classList.add("active");
+
+    clearMessage();
+
+}
+
+
+/* =====================================
+   REGISTER
+===================================== */
+
+async function register() {
+
+    const email =
+        document
+        .getElementById("registerEmail")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("registerPassword")
+        .value;
+
+
+    if (!email || !password) {
+
+        showMessage(
+            "Email dan password wajib diisi."
+        );
+
+        return;
+
+    }
+
+
+    if (password.length < 6) {
+
+        showMessage(
+            "Password minimal 6 karakter."
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Membuat akun..."
+    );
+
+
+    const {
+        error
+    } =
+        await db.auth.signUp({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+    if (error) {
+
+        showMessage(
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Akun berhasil dibuat. Cek email jika verifikasi diperlukan."
+    );
+
+}
+
+
+/* =====================================
+   LOGIN
+===================================== */
+
+async function login() {
+
+    const email =
+        document
+        .getElementById("loginEmail")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+
+    if (!email || !password) {
+
+        showMessage(
+            "Email dan password wajib diisi."
+        );
+
+        return;
+
+    }
+
+
+    showMessage(
+        "Memproses login..."
+    );
+
+
+    const {
+        data,
+        error
+    } =
+        await db.auth.signInWithPassword({
+
+            email: email,
+
+            password: password
+
+        });
+
+
+    if (error) {
+
+        showMessage(
+            error.message
+        );
+
+        return;
+
+    }
+
+
+    currentUser =
+        data.user;
+
+    showApp();
+
+}
+
+
+/* =====================================
+   LOGOUT
+===================================== */
+
+async function logout() {
+
+    await db.auth.signOut();
+
+    transactions = [];
+
+    showAuth();
+
+}
+
+
+/* =====================================
+   PAGE
+===================================== */
+
+function showAuth() {
+
+    document
+        .getElementById("authPage")
+        .style.display = "flex";
+
+    document
+        .getElementById("appPage")
+        .style.display = "none";
+
+}
+
+
+async function showApp() {
+
+    document
+        .getElementById("authPage")
+        .style.display = "none";
+
+    document
+        .getElementById("appPage")
+        .style.display = "block";
+
+
+    document
+        .getElementById("userEmail")
+        .textContent =
+        currentUser.email;
+
+
+    await loadTransactions();
+
+}
+
+
+/* =====================================
+   LOAD DATABASE
+===================================== */
+
+async function loadTransactions() {
+
+    const {
+        data,
+        error
+    } =
+    await db
+        .from("transactions")
+        .select("*")
+        .order(
+            "transaction_date",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Gagal mengambil data transaksi: "
+            + error.message
+        );
+
+        return;
+
+    }
+
+
+    transactions =
+        data || [];
+
+
+    updateAll();
+
+}
+
+
+/* =====================================
+   ADD TRANSACTION
+===================================== */
+
+async function addTransaction() {
+
+    const name =
+        document
+        .getElementById("name")
+        .value
+        .trim();
+
+    const amount =
+        Number(
+            document
+            .getElementById("amount")
+            .value
+        );
+
+    const type =
+        document
+        .getElementById("type")
+        .value;
+
+    const category =
+        document
+        .getElementById("category")
+        .value;
+
+    const date =
+        document
+        .getElementById("date")
+        .value;
+
+
+    if (
+        !name ||
+        !amount ||
+        amount <= 0 ||
+        !date
+    ) {
+
+        alert(
+            "Lengkapi data transaksi."
+        );
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+    await db
+        .from("transactions")
+        .insert({
+
+            user_id:
+                currentUser.id,
+
+            name:
+                name,
+
+            amount:
+                amount,
+
+            type:
+                type,
+
+            category:
+                category,
+
+            transaction_date:
+                date
+
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+
+        alert(
+            "Gagal menyimpan transaksi: "
+            + error.message
+        );
+
+        return;
+
+    }
+
+
+    transactions.unshift(data);
+
+
+    closeModal();
+
+    clearForm();
+
+    updateAll();
+
+}
+
+
+/* =====================================
+   DELETE
+===================================== */
+
+async function deleteTransaction(id) {
+
+    if (
+        !confirm(
+            "Hapus transaksi ini?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+    await db
+        .from("transactions")
+        .delete()
+        .eq("id", id);
+
+
+    if (error) {
+
+        alert(
+            "Gagal menghapus transaksi: "
+            + error.message
+        );
+
+        return;
+
+    }
+
+
+    transactions =
+        transactions.filter(
+            t => t.id !== id
+        );
+
+
+    updateAll();
+
+}
+
+
+/* =====================================
+   DASHBOARD
+===================================== */
+
+function updateDashboard() {
+
+    const income =
+        transactions
+        .filter(
+            t => t.type === "income"
+        )
+        .reduce(
+            (sum,t) =>
+                sum + Number(t.amount),
+            0
+        );
+
+
+    const expense =
+        transactions
+        .filter(
+            t => t.type === "expense"
+        )
+        .reduce(
+            (sum,t) =>
+                sum + Number(t.amount),
+            0
+        );
+
+
+    const balance =
+        income - expense;
+
+
+    document
+        .getElementById("balance")
+        .textContent =
+        rupiah(balance);
+
+
+    document
+        .getElementById("income")
+        .textContent =
+        rupiah(income);
+
+
+    document
+        .getElementById("expense")
+        .textContent =
+        rupiah(expense);
+
+}
+
+
+/* =====================================
+   TRANSACTIONS
+===================================== */
+
+function renderTransactions() {
+
+    const list =
+        document
+        .getElementById(
+            "transactionList"
+        );
+
+
+    let data =
+        transactions
+        .filter(t => {
+
+            if (
+                currentFilter ===
+                "all"
+            ) {
+
+                return true;
+
+            }
+
+            return (
+                t.type ===
+                currentFilter
+            );
+
+        });
+
+
+    if (!data.length) {
+
+        list.innerHTML = `
+            <div class="empty">
+                Belum ada transaksi.
+                <br>
+                Yuk mulai mencatat
+                keuanganmu!
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        data.map(t => {
+
+            const icons = {
+
+                Makanan: "🍜",
+
+                Transportasi: "🚗",
+
+                Belanja: "🛍️",
+
+                Hiburan: "🎮",
+
+                Tagihan: "💳",
+
+                Pendidikan: "📚",
+
+                Gaji: "💰",
+
+                Lainnya: "📦"
+
+            };
+
+
+            const icon =
+                icons[t.category] ||
+                "📦";
+
+
+            return `
+
+            <div class="transaction">
+
+                <div
+                    class="transaction-left"
+                >
+
+                    <div class="icon">
+                        ${icon}
+                    </div>
+
+                    <div>
+
+                        <div
+                            class="transaction-name"
+                        >
+                            ${escapeHTML(t.name)}
+                        </div>
+
+                        <div
+                            class="transaction-date"
+                        >
+                            ${t.category}
+                            •
+                            ${formatDate(
+                                t.transaction_date
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <span
+                        class="
+                        transaction-amount
+                        ${t.type}
+                        "
+                    >
+                        ${
+                            t.type === "income"
+                            ? "+"
+                            : "-"
+                        }
+
+                        ${rupiah(
+                            Number(t.amount)
+                        )}
+
+                    </span>
+
+
+                    <button
+                        class="delete"
+                        onclick="
+                            deleteTransaction(
+                                '${t.id}'
+                            )
+                        "
+                    >
+                        ✕
+                    </button>
+
+                </div>
+
+            </div>
+
+            `;
+
+        }).join("");
+
+}
+
+
+/* =====================================
+   FILTER
+===================================== */
+
+function filterData(
+    type,
+    element
+) {
+
+    currentFilter = type;
+
+
+    document
+        .querySelectorAll(".filter")
+        .forEach(
+            el =>
+                el.classList
+                .remove("active")
+        );
+
+
+    element
+        .classList
+        .add("active");
+
+
+    renderTransactions();
+
+}
+
+
+/* =====================================
+   CHART
+===================================== */
+
+function renderChart() {
+
+    const chart =
+        document
+        .getElementById("chart");
+
+
+    const today =
+        new Date();
+
+
+    let days = [];
+
+
+    for (
+        let i = 6;
+        i >= 0;
+        i--
+    ) {
+
+        const d =
+            new Date(today);
+
+        d.setDate(
+            today.getDate() - i
+        );
+
+        days.push(d);
+
+    }
+
+
+    const values =
+        days.map(day => {
+
+            const key =
+                localDate(day);
+
+
+            return transactions
+                .filter(
+                    t =>
+                        t.type ===
+                        "expense" &&
+                        t.transaction_date ===
+                        key
+                )
+                .reduce(
+                    (sum,t) =>
+                        sum +
+                        Number(t.amount),
+                    0
+                );
+
+        });
+
+
+    const max =
+        Math.max(
+            ...values,
+            1
+        );
+
+
+    chart.innerHTML =
+        values.map(
+            (value,index) => {
+
+                const height =
+                    (value / max) *
+                    100;
+
+
+                return `
+
+                <div
+                    class="bar-wrapper"
+                >
+
+                    <div
+                        class="bar"
+                        style="
+                        height:
+                        ${Math.max(
+                            height,
+                            5
+                        )}%
+                        "
+                        title="${rupiah(value)}"
+                    ></div>
+
+                    <div
+                        class="bar-label"
+                    >
+                        ${days[index]
+                            .getDate()}
+                    </div>
+
+                </div>
+
+                `;
+
+            }
+        ).join("");
+
+}
+
+
+/* =====================================
+   INSIGHT
+===================================== */
+
+function renderInsight() {
+
+    const income =
+        transactions
+        .filter(
+            t =>
+                t.type ===
+                "income"
+        )
+        .reduce(
+            (sum,t) =>
+                sum +
+                Number(t.amount),
+            0
+        );
+
+
+    const expense =
+        transactions
+        .filter(
+            t =>
+                t.type ===
+                "expense"
+        )
+        .reduce(
+            (sum,t) =>
+                sum +
+                Number(t.amount),
+            0
+        );
+
+
+    const element =
+        document
+        .getElementById("insight");
+
+
+    if (!transactions.length) {
+
+        element.innerHTML =
+            "Belum ada transaksi.";
+
+        return;
+
+    }
+
+
+    if (!income) {
+
+        element.innerHTML =
+            "Tambahkan pemasukan untuk melihat gambaran kondisi keuanganmu.";
+
+        return;
+
+    }
+
+
+    const ratio =
+        expense / income * 100;
+
+
+    if (ratio < 50) {
+
+        element.innerHTML =
+            `Pengeluaran sekitar
+            <b>${ratio.toFixed(0)}%</b>
+            dari pemasukan.`;
+
+    }
+
+    else if (ratio < 80) {
+
+        element.innerHTML =
+            `Pengeluaran sekitar
+            <b>${ratio.toFixed(0)}%</b>
+            dari pemasukan.
+            Pantau beberapa kategori
+            pengeluaran terbesar.`;
+
+    }
+
+    else {
+
+        element.innerHTML =
+            `Pengeluaran sekitar
+            <b>${ratio.toFixed(0)}%</b>
+            dari pemasukan.
+            Coba cek kembali
+            pengeluaran terbesar.`;
+
+    }
+
+}
+
+
+/* =====================================
+   MODAL
+===================================== */
+
+function openModal() {
+
+    document
+        .getElementById("modal")
+        .style.display =
+        "flex";
+
+
+    document
+        .getElementById("date")
+        .value =
+        localDate(
+            new Date()
+        );
+
+}
+
+
+function closeModal() {
+
+    document
+        .getElementById("modal")
+        .style.display =
+        "none";
+
+}
+
+
+function clearForm() {
+
+    document
+        .getElementById("name")
+        .value = "";
+
+
+    document
+        .getElementById("amount")
+        .value = "";
+
+}
+
+
+/* =====================================
+   HELPERS
+===================================== */
+
+function rupiah(number) {
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }
+    ).format(number);
+
+}
+
+
+function formatDate(date) {
+
+    return new Date(
+        date + "T00:00:00"
+    ).toLocaleDateString(
+        "id-ID",
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+function localDate(date) {
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2,"0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+function updateAll() {
+
+    updateDashboard();
+
+    renderTransactions();
+
+    renderChart();
+
+    renderInsight();
+
+}
+
+
+function showMessage(message) {
+
+    document
+        .getElementById("authMessage")
+        .textContent =
+        message;
+
+}
+
+
+function clearMessage() {
+
+    document
+        .getElementById("authMessage")
+        .textContent =
+        "";
+
+}
+
+
+/* =====================================
+   START
+===================================== */
+
+checkSession();
+
+</script>
+
+</body>
+
+</html>
